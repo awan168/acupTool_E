@@ -1,0 +1,632 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>上醫堂經絡循行取穴程式</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://jqueryui.com/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- <script src="https://www.w3schools.com/lib/w3.js"></script> -->
+  <script>
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+  </script>
+  <script type="text/javascript" src="acupElement_E.js"></script>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <script>
+       let listStr = "<h5>";
+       let MeriList = [HandTaiYing,  HandYangMing, FootYangMing, FootTaiYing, HandShaoYing, HandTaiYang,  FootTaiYang,  FootShaoYing, HandJueYing,  HandShaoYang, FootShaoYang, FootJueYing];
+       let SuPListList = [SuPList_00, SuPList_01, SuPList_02, SuPList_03, SuPList_04, SuPList_05, SuPList_06, SuPList_07, SuPList_08, SuPList_09, SuPList_10, SuPList_11];
+       let OrgNameList     =  [0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,   11];
+       let SameNameList    =  [3,   2,   1,   0,   7,   6,   5,   4,  11,  10,    9,    8];
+       let AlterNameList   =  [6,  11,   8,   6,  10,   3,   0,   9,   2,   7,    4,    1];
+       let InOutNameList   =  [1,   0,   3,   2,   5,   4,   7,   6,   9,   8,   11,   10];
+       let Add6NameList    =  [6,   7,   8,   9,  10,  11,   0,   1,   2,   3,    4,    5];
+       let CrossMiddleList =  [11,  2,   1,   4,   3,   6,   5,   8,   7,  10,    9,    0];
+       let SameLocateList  =  [4,   5,   6,   7,   8,   9,  10,  11,   0,   1,    2,    3];
+       let InsideUnitList  =  [2,   3,   0,   1,   6,   7,   4,   5,  10,  11,    8,    9];
+       let formNow;       
+       let Meridian;
+
+       let hexa2AcupList0     =  [ "011",  "011",  "100",  "100",  "101",  "101",  "010",  "010",  "001",  "001",  "110",  "110" ];
+       let hexa2AcupList1     =  [ "110",  "001",  "010",  "101",  "011",  "100",  "111",  "000",  "011",  "100",  "111",  "000" ];
+       let hexa2AcupList2     =  [ "011",  "001",  "010",  "101",  "011",  "100",  "111",  "000",  "011",  "100",  "111",  "000" ]; //TBD
+
+       let hexa2AcupListNow     = hexa2AcupList0;
+       let t5_hexa2AcupListNow     = hexa2AcupList0;
+
+        let cbHitWeight = [];
+
+
+       //--- for 五門十變 ---------
+       //[本穴]       [臟腑]           [本穴]       [合化實證]  [腑取穴]  [臟取穴]   [合化虛證] [腑取穴] [臟取穴]    [互合治療法]
+       let LuList = ["HeavenlyStem_1_6_to_earth", "Gallbladder(wood)",  "GB41（輸)",  "", "ST36",   "KI10",  "", "SI5   ",  "LU8", "SP3" ];    
+       let LiList = ["HeavenlyStem_1_6_to_earth", "Spleen (earth) ",  "SP3（輸） ",  "", "LR2* ",   "LI2*", "", "ST36 ",  "KI10", "GB41" ];   
+       let StList = ["HeavenlyStem_2_7_to_metal", "Liver (wood) ",  "LR1（井)  ",  "", "ST36",   "KI10",  "", "SI5	 ",   "LU8", "LI1" ];	      
+       let SpList = ["HeavenlyStem_2_7_to_metal", "Large Intestine (gold) ",  "LI1（井） ",  "", "SI5  ",   "LU8",  "", "GB41",   "SP3", "LR1" ];	         
+       let HtList = ["HeavenlyStem_3_8_to_water", "Small intestine (sovereign fire) ",  "SI5（經)  ",  "", "GB41",   "SP3",  "", "HT8	     ",   "通谷", "LU8" ];	    
+       let SiList = ["HeavenlyStem_3_8_to_water", "Lung (gold) ",  "LU8（經） ",  "", "SI5  ",   "LU8",  "", "GB41",   "SP3", "SI5" ];	    
+       let BlList = ["HeavenlyStem_4_9_to_wood", "Heart (sovereign fire) ",  "HT8（滎） ",  "", "GB41",   "SP3",  "", "HT8	     ",   "通谷", "通谷" ];    
+       let KiList = ["HeavenlyStem_4_9_to_wood", "Bladder (water) ",  "通谷（滎)  ",  "", "HT8  ",   "通谷",  "", "LR8*	     ",   "LI11*","HT8" ];       
+       let PcList = ["HeavenlyStem_4_9_to_wood", "Triple focus (ministerial fire)",  "SJ6（經） ",  "", "GB41",   "SP3",  "", "HT8	     ",   "通谷", "HT8" ];	     
+       let SjList = ["HeavenlyStem_5_10_to_fire", "Stomach (earth) ",  "ST36（合)",  "", "LR2* ",   "LI2*", "", "ST36 ",  "KI10", "KI10" ];	    
+       let GbList = ["HeavenlyStem_5_10_to_fire", "Kidney (water) ",  "KI10（合） ",  "", "HT8  ",   "通谷",  "", "LR8*	 ",   "LI11*","ST36" ];   
+       let LrList = ["HeavenlyStem_5_10_to_fire", "Pericardium (ministerial fire)",  "PC8（滎） ",  "", "GB41",   "SP3",  "", "HT8	 ",   "通谷", "ST36" ];    
+
+       let mainList = [LuList, LiList, StList, SpList, HtList, SiList, BlList, KiList, PcList, SjList, GbList, LrList];
+
+       let selOrgan = 0;
+
+       let OrgRealNameList    =  [  "LuLung",   "LILarge Intestine",   "STStomach",   "SPSpleen",   "HTHeart",   "SISmall Intestine",   "BLBladder",   "KIKidney",   "PCJeart包",   "SJSanJiao",   "GBGall Bladder",   "LRLiver"]            
+       let Org2ndRealNameList =  [  "GBGall Bladder",   "SPSpleen",     "LRLiver",   "LILarge Intestine", "SISmall Intestine", "LuLung",     "HTJeart",     "BLBladder", "SJSanJiao",   "STStomach",     "KIKidney",   "PCPericardium" ]
+
+       let meriScore = [0,0,0,0,0,0,0,0,0,0,0,0];
+
+       let sympQ = ["氣短", "痰多"]
+  
+  </script> 
+
+<style>
+img {
+    max-width: 100%;
+    height: auto;
+    align-items: center;
+}
+button { 
+  height:50px; 
+} 
+</style>
+
+</head>
+<body>
+
+         <img src="acupTool_E_title.gif" height="150" width="450">
+         <!--<p>數位人生哲學起課程式</p>-->
+<!---
+<div>
+<script>
+  (function() {
+    var cx = '005243992177716269613:k0hbu6firhe';
+    var gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
+    gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+<gcse:search></gcse:search>
+</div>
+--->
+
+<div id="tabs">
+  <ul>
+<!---    <li><a href="#tabs-0">經絡定位</a></li> --->
+    <li><a href="#tabs-1">Meridan Finder</a></li>
+    <li><a href="#tabs-2">Acupoint Finder</a></li>
+    <li><a href="#tabs-3">Balance Matrix</a></li>
+<!---    <li><a href="#tabs-4">易卦取穴</a></li>
+    <li><a href="#tabs-5">十二消息卦</a></li>
+    <li><a href="#tabs-6">五門十變</a></li>--->
+<!---    <li><a href="#tabs-7">靈龜八法</a></li> --->
+  </ul>
+
+  <!---------------------- TAB ------------------------------------
+  <div id="tabs-0">
+
+  <div>
+  <label>定位經絡查詢</label>
+  <ul>
+  <li><button onclick="location.href='sym_search1.html'" type="button">臟腑辨證定位</button></li>
+  <br>
+  <li><button onclick="location.href='sym_search2.html'" type="button">循行部位定位</button></li>
+  </ul>
+  </div>
+
+  </div>
+
+--->
+
+  <!---------------------- TAB --------------------------------------->
+  <div id="tabs-1">
+
+
+
+       <table border="0" cellpadding="1" cellspacing="1" style="width: 360px">
+       <tbody> 
+           <tr>
+               <td><button onclick="calMeri(0)">Hand Taiyin LU</button></td>
+               <td><button onclick="calMeri(1)">Hand Yangming LI</button></td>
+           </tr>
+           <tr>
+               <td><button onclick="calMeri(3)">Foot Taiyin SP</button></td>
+               <td><button onclick="calMeri(2)"> Foot Yangming ST</button></td>
+           </tr>
+           <tr>
+               <td><button onclick="calMeri(4)">Hand Shaoyin HT</button></td>
+               <td><button onclick="calMeri(5)">Hand Taiyang SI</button></td>
+           </tr>
+           <tr>
+               <td><button onclick="calMeri(7)">Foot Shaoyin KI</button></td>
+               <td><button onclick="calMeri(6)">Foot Taiyang BL</button></td>
+           </tr>
+           <tr>
+               <td><button onclick="calMeri(8)">Hand Jue Yin PC</button></td>
+               <td><button onclick="calMeri(9)">Hand Shaoyang SJ</button></td>
+           </tr>
+           <tr>
+               <td><button onclick="calMeri(11)">Foot Jue Yin LR</button></td>
+               <td><button onclick="calMeri(10)"> Foot Shaoyang GB</button></td>
+           </tr>
+       </tbody>
+       </table>
+       <p> &nbsp;</p>
+
+                <table border="1" cellpadding="1" cellspacing="0" style="width: 300px">
+       <tbody> 
+           <tr><td>Same Name Meridian : </td><td><p id="meriContent_01"></p></td></tr>
+           <tr><td>Cross Connect Meridian : </td><td><p id="meriContent_02"></p></td></tr>
+           <tr><td>Exterior-Interior Meridian : </td><td><p id="meriContent_03"></p></td></tr>
+           <tr><td>Same Clock Digit Meridian : </td><td><p id="meriContent_04"></p></td></tr>
+           <tr><td>Horizontal Connect Meridian : </td><td><p id="meriContent_05"></p></td></tr>
+           <tr><td>Same Zone Location Meridian : </td><td><p id="meriContent_06"></p></td></tr>
+           <tr><td>Same Zone Hand-Foot Meridian : </td><td><p id="meriContent_07"></p></td></tr>
+       </tbody>
+       </table>
+       <p> &nbsp;</p>
+         
+       <br><img src="top_concept_big_E.png"  width="450">       
+<script type="text/javascript" charset="UTF-8">
+       
+       
+       function calMeri(meriClick){
+
+/*
+        listStr=""
+        listStr=listStr+"<br> Same Name Meridian : "+MeriList[SameNameList[meriClick]]
+        listStr=listStr+"<br> Cross Connect Meridian : "+MeriList[AlterNameList[meriClick]]
+        listStr=listStr+"<br> Exterior-Interior Meridian : "+MeriList[InOutNameList[meriClick]]
+        listStr=listStr+"<br> Same Clock Digit Meridian : "+MeriList[Add6NameList[meriClick]]
+        listStr=listStr+"<br> Horizontal Connect Meridian : "+MeriList[CrossMiddleList[meriClick]]
+        listStr=listStr+"<br> Same Zone Location Meridian : "+MeriList[SameLocateList[meriClick]]
+        listStr=listStr+"<br> Same Zone Hand-Foot Meridian : "+MeriList[InsideUnitList[meriClick]]
+
+
+        listStr=listStr+"<br>\n"+orgDiagList[meriClick]
+
+        document.getElementById("meriContent").innerHTML = listStr;   
+*/
+
+
+        document.getElementById("meriContent_01").innerHTML = MeriList[SameNameList[meriClick]];
+        document.getElementById("meriContent_02").innerHTML = MeriList[AlterNameList[meriClick]];
+        document.getElementById("meriContent_03").innerHTML = MeriList[InOutNameList[meriClick]];
+        document.getElementById("meriContent_04").innerHTML = MeriList[Add6NameList[meriClick]];
+        document.getElementById("meriContent_05").innerHTML = MeriList[CrossMiddleList[meriClick]];
+        document.getElementById("meriContent_06").innerHTML = MeriList[SameLocateList[meriClick]];
+        document.getElementById("meriContent_07").innerHTML = MeriList[InsideUnitList[meriClick]];
+        
+        }
+
+   </script>
+
+
+         
+         <br>
+  </div>
+
+  <!---------------------- TAB --------------------------------------->
+  <div id="tabs-2">
+
+  <div> <textarea id="t2_myText_0" rows="2" cols="30">Meridian Selected: </textarea> </div>
+
+
+  <div>
+       <table border="1" cellpadding="1" cellspacing="1" style="width: 360px">
+       <tbody> 
+           <form name="t2_form_name" id="t2_form_name">
+           <tr>
+               <td><label><input name="t2_sel" type="radio" value="0" checked>Lu:Lung</label></td>
+               <td><label><input name="t2_sel" type="radio" value="1">LI:Large Intestine</label></td>
+               <td><label><input name="t2_sel" type="radio" value="2">ST:Stomach</label></td>
+               <td><label><input name="t2_sel" type="radio" value="3">SP:Spleen</label></td>
+           </tr>
+           <tr>
+               <td><label><input name="t2_sel" type="radio" value="4">HT:Heart</label></td>
+               <td><label><input name="t2_sel" type="radio" value="5">SI:Small Intestine</label></td>
+               <td><label><input name="t2_sel" type="radio" value="6">BL:Bladder</label></td>
+               <td><label><input name="t2_sel" type="radio" value="7">KI:Kidney</label></td>
+           </tr>
+           <tr>
+               <td><label><input name="t2_sel" type="radio" value="8">PC:Pericardium</label></td>
+               <td><label><input name="t2_sel" type="radio" value="9">SJ:SanJiao</label></td>
+               <td><label><input name="t2_sel" type="radio" value="10">GB:Gall Bladder</label></td>
+               <td><label><input name="t2_sel" type="radio" value="11">LR:Liver</label></td>
+           </tr>
+           </form>
+
+       </tbody>
+       </table>
+  </div>
+
+      <div>
+           <table>    
+             <tr><button onclick="get_t2_sel(0)">Select acupoint in same meridian</button></tr>
+             <tr><button onclick="get_t2_sel(1)">Select acupoint in different meridian</button></tr>
+             <tr><button onclick="get_t2_sel(2)">Select acupoint in same group meridian</button></tr>
+             <tr><button onclick="get_t2_sel(3)">Source/connecting points selection</button></tr>
+           </table>
+      </div>         
+
+
+<!---  <div> <textarea id="t2_myText_1" rows="20" cols="60">Meridian Selected: </textarea> </div> --->
+
+       <table border="1" cellpadding="1" cellspacing="1" style="width: 420px">
+       <tbody> 
+           <tr>
+               <td colspan="2">
+                  <p><p id="acupContent"></p></p>
+               </td>
+           </tr>
+       </tbody>
+       </table>
+       <p> &nbsp;</p>
+
+<!--
+<div>
+<form name="tabs_1_sel" id="SELECTION"> 
+     <select name = "Meridian">
+           <option value=0>☱ Hand Taiyin lung meridian     </option>
+           <option value=1>☲ Hand Shaoyin heart meridian     </option>
+           <option value=2>☳ Hand Jue Yin Pericardium meridian     </option>
+           <option value=3>☲ Hand Taiyang small intestine meridian     </option>
+           <option value=4>☳ Hand Shaoyang Sanjiao meridian     </option>
+           <option value=5>☱ Hand Yangming Large Intestine meridian     </option>
+           <option value=6>☶ Foot Taiyin spleen meridian     </option>
+           <option value=7>☵ Foot Shaoyin Kidney meridian     </option>
+           <option value=8>☴ Foot Jue Yin liver meridian     </option>
+           <option value=9>☵ Foot Taiyang Bladder meridian              </option>
+           <option value=10>☴ Foot Shaoyang Gall Bladder meridian     </option>
+           <option value=11>☶ Foot Yangming stomach meridian      </option>
+      </select>
+      <button onclick="calAcup(SELECTION.Meridian.value)">Select Meridian</button>
+</form>
+</div>
+-->
+
+       
+       
+       
+       
+<script type="text/javascript" charset="UTF-8">
+       
+       function get_t2_sel (selNow) {
+                  //  讀取radio的值
+                  //alert("length="+form.t2_sel.length);
+                  //alert("Hello");
+                  var form = document.getElementById("t2_form_name");
+                  for(var i=0; i<form.t2_sel.length;i++){
+                      if(form.t2_sel[i].checked){
+                          var meriClick = form.t2_sel[i].value;
+                          //alert("meriClick="+meriClick+"i="+i);
+
+                          //document.getElementById("myText_t4").value = "";
+                          //document.getElementById("myText_t4").value = hexaOrder;
+
+                          listStr = "<h4>";
+                          if (selNow == 0){
+                              listStr=listStr+"<br> Deficiency : "+MeriList[OrgNameList[meriClick]]+" : "+SuPListList[meriClick][0];
+                              listStr=listStr+"<br> Excess : "+MeriList[OrgNameList[meriClick]]+" : "+SuPListList[meriClick][1];
+                          }
+                          else if (selNow == 1){
+                          listStr=listStr+"<br> Deficiency : "+MeriList[OrgNameList[meriClick]]+"-->Mother Meridian Main Acupoint : "+SuPListList[meriClick][2];
+                          listStr=listStr+"<br> Excess : "+MeriList[OrgNameList[meriClick]]+"-->Son Meridian Main Acupoint : "+SuPListList[meriClick][3];
+                          }
+                          else if (selNow == 2){
+                          listStr=listStr+"<br> Select acupoint in same group meridian : "+MeriList[OrgNameList[meriClick]]+"之三爻穴位 : "+SuPListList[meriClick][4];
+                          listStr=listStr+ "<br> Select acupoint in same group meridian : "+MeriList[OrgNameList[meriClick]]+"之上爻穴位 : "+SuPListList[meriClick][5];
+                          }
+                          else if (selNow == 3){
+                          listStr=listStr+"<br> Source Acupoint of Same Meridian : "+MeriList[OrgNameList[meriClick]]+" -->Source point : "+SuPListList[meriClick][6];
+                          listStr=listStr+  "<br> Exterior-Interior Meridian : "+MeriList[OrgNameList[meriClick]]+" -->Connecting point : "+SuPListList[meriClick][7];
+                          }
+                          listStr=listStr+  "</h4>";
+                  
+                          document.getElementById("t2_myText_0").value = "Meridian Selected : "+OrgRealNameList[meriClick];   
+                  
+                          document.getElementById("acupContent").innerHTML = listStr;   
+                          
+                      }
+                  }
+       }
+       
+       function calAcup(meriClick){
+
+        listStr = "<h4>";
+        listStr=listStr+" : "+MeriList[OrgNameList[meriClick]]+" : "+SuPListList[meriClick][0];
+        listStr=listStr+"<br>  : "+MeriList[OrgNameList[meriClick]]+" : "+SuPListList[meriClick][1];
+        listStr=listStr+"<br>  : "+MeriList[OrgNameList[meriClick]]+"-->Mother Meridian Main Acupoint : "+SuPListList[meriClick][2];
+        listStr=listStr+"<br>  : "+MeriList[OrgNameList[meriClick]]+"-->Son Meridian Main Acupoint : "+SuPListList[meriClick][3];
+        listStr=listStr+"<br><br> Select acupoint in same group meridian : "+MeriList[OrgNameList[meriClick]]+" : "+SuPListList[meriClick][4];
+        listStr=listStr+ "<br> Select acupoint in same group meridian : "+MeriList[OrgNameList[meriClick]]+" : "+SuPListList[meriClick][5];
+        listStr=listStr+"<br><br> Source Acupoint of Same Meridian : "+MeriList[OrgNameList[meriClick]]+" -->Source point : "+SuPListList[meriClick][6];
+        listStr=listStr+  "<br> Exterior-Interior Meridian : "+MeriList[OrgNameList[meriClick]]+" -->Connecting point : "+SuPListList[meriClick][7];
+        listStr=listStr+  "</h4>";
+
+        document.getElementById("t2_myText_0").value = "Meridian Selected : "+OrgRealNameList[meriClick];   
+
+        document.getElementById("acupContent").innerHTML = listStr;   
+
+        
+        }
+ 
+        function getSel(){
+            formNow = document.getElementById("SELECTION");
+            //  讀取select的值
+            Meridian = formNow.Meridian.value;
+            calAcup(Meridian);
+        }
+
+
+
+
+
+   </script>
+       
+       
+  </div>
+
+  <!---------------------- TAB --------------------------------------->
+  <div id="tabs-3">
+
+<div>
+    <table border="1" cellpadding="1" cellspacing="1" style="width: 300px">
+    <tr>
+    <td>Lung  : <input type="checkbox" id="myCheck0"></td>
+    <td>Large Intestine: <input type="checkbox" id="myCheck1"></td>
+    <td>Stomach  : <input type="checkbox" id="myCheck2"></td>
+    <td>Spleen  : <input type="checkbox" id="myCheck3"></td>
+    </tr>
+    <tr>
+    <td>Heart  : <input type="checkbox" id="myCheck4"></td>
+    <td>Small Intestine: <input type="checkbox" id="myCheck5"></td>
+    <td>Bladder: <input type="checkbox" id="myCheck6"></td>
+    <td>Kidney  : <input type="checkbox" id="myCheck7"></td>
+    </tr>
+    <tr>
+    <td>Pericardium: <input type="checkbox" id="myCheck8"></td>
+    <td>SanJiao: <input type="checkbox" id="myCheck9"></td>
+    <td>Gall Bladder: <input type="checkbox" id="myCheck10"></td>
+    <td>Liver: <input type="checkbox" id="myCheck11"></td>
+    </tr>
+    </table>
+</div>
+
+<div>
+<button onclick="pickFunction()">The Weight of Hitted Meridian</button>
+<button onclick="cleanFunction()">Reset</button>
+</div>
+
+<div>
+   <textarea id="myText" rows="18" cols="50">
+               N/A</textarea>
+</div>
+
+<script>
+    //var listStr = "";
+
+    function cleanFunction() {
+
+        location.reload();
+
+/*        for (i = 0; i < 12; i++) {
+            cbHitWeight[i] = 0;
+        }
+        var listStr = "The Statistics Result:\n\n";
+        listStr = listStr + "\nLung_meridian score   : "+cbHitWeight[0];
+        listStr = listStr + "\nLarge Intestine_meridian score : "+cbHitWeight[1];
+        listStr = listStr + "\nStomach_meridian score   : "+cbHitWeight[2];
+        listStr = listStr + "\nSpleen_meridian score   : "+cbHitWeight[3];
+        listStr = listStr + "\nHeart_meridian score   : "+cbHitWeight[4];
+        listStr = listStr + "\nSmall Intestine_meridian score : "+cbHitWeight[5];
+        listStr = listStr + "\nBladder_meridian score : "+cbHitWeight[6];
+        listStr = listStr + "\nKidney_meridian score   : "+cbHitWeight[7];
+        listStr = listStr + "\nPericardium_meridian score : "+cbHitWeight[8];
+        listStr = listStr + "\nSanJiao_meridian score : "+cbHitWeight[9];
+        listStr = listStr + "\nGall Bladder_meridian score   : "+cbHitWeight[10];
+        listStr = listStr + "\nLiver_meridian score   : "+cbHitWeight[11];
+
+        //alert(listStr);
+
+
+        document.getElementById("myText").value = "";          
+        document.getElementById("myText").value += listStr;          
+*/
+    }
+
+
+    function pickFunction() {
+
+        var cbList = [];
+        cbList.length = 0;
+
+        for (i = 0; i < 12; i++) {
+            cbHitWeight[i] = 0;
+        }
+
+        //alert ("cbHitWeight[0]="+cbHitWeight[0])
+
+        var c0 = document.getElementById("myCheck0");
+        var c1 = document.getElementById("myCheck1");
+        var c2 = document.getElementById("myCheck2");
+        var c3 = document.getElementById("myCheck3");
+        var c4 = document.getElementById("myCheck4");
+        var c5 = document.getElementById("myCheck5");
+        var c6 = document.getElementById("myCheck6");
+        var c7 = document.getElementById("myCheck7");
+        var c8 = document.getElementById("myCheck8");
+        var c9 = document.getElementById("myCheck9");
+        var c10 = document.getElementById("myCheck10");
+        var c11 = document.getElementById("myCheck11");
+        //var cbStr = ""; 
+        if ( c0.checked == true) { cbList.push(0);}
+        if ( c1.checked == true) { cbList.push(1);}
+        if ( c2.checked == true) { cbList.push(2);}
+        if ( c3.checked == true) { cbList.push(3);}
+        if ( c4.checked == true) { cbList.push(4);}
+        if ( c5.checked == true) { cbList.push(5);}
+        if ( c6.checked == true) { cbList.push(6);}
+        if ( c7.checked == true) { cbList.push(7);}
+        if ( c8.checked == true) { cbList.push(8);}
+        if ( c9.checked == true) { cbList.push(9);}
+        if ( c10.checked == true) { cbList.push(10);}
+        if ( c11.checked == true) { cbList.push(11);}
+    
+        //alert(cbList[0]+"...."+cbList[1]+"...."+cbList[2]);
+
+
+
+      var OrgNameList     =  [0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,   11]
+      var SameNameList    =  [3,   2,   1,   0,   7,   6,   5,   4,  11,  10,    9,    8]
+      var AlterNameList   =  [6,  11,   8,   6,  10,   3,   0,   9,   2,   7,    4,    1]
+      var InOutNameList   =  [1,   0,   3,   2,   5,   4,   7,   6,   9,   8,   11,   10]
+      var Add6NameList    =  [6,   7,   8,   9,  10,  11,   0,   1,   2,   3,    4,    5]
+      var CrossMiddleList =  [11,  2,   1,   4,   3,   6,   5,   8,   7,  10,    9,    0]
+      var SameLocateList  =  [4,   5,   6,   7,   8,   9,  10,  11,   0,   1,    2,    3]
+      var InsideUnitList  =  [2,   3,   0,   1,   6,   7,   4,   5,  10,  11,    8,    9]
+
+      var listOfList = [SameNameList, AlterNameList, InOutNameList, Add6NameList, CrossMiddleList, SameLocateList, InsideUnitList]
+      var listOf5List = [SameNameList, AlterNameList, InOutNameList, Add6NameList, CrossMiddleList]
+
+      var groupList_LU=[]
+      var groupList_LI=[]
+      var groupList_ST=[]
+      var groupList_SP=[]
+      var groupList_HT=[]
+      var groupList_SI=[]
+      var groupList_BL=[]
+      var groupList_KI=[]
+      var groupList_PC=[]
+      var groupList_SJ=[]
+      var groupList_GB=[]
+      var groupList_LR=[]
+
+      groupList_LU.length = 0;
+      groupList_LI.length = 0;
+      groupList_ST.length = 0;
+      groupList_SP.length = 0;
+      groupList_HT.length = 0;
+      groupList_SI.length = 0;
+      groupList_BL.length = 0;
+      groupList_KI.length = 0;
+      groupList_PC.length = 0;
+      groupList_SJ.length = 0;
+      groupList_GB.length = 0;
+      groupList_LR.length = 0;
+
+      //alert("groupList_BL:"+groupList_BL)
+
+      for (i = 0; i < 7; i++) {
+          groupList_LU.push(listOfList[i][0]);
+          groupList_LI.push(listOfList[i][1]);
+	    groupList_ST.push(listOfList[i][2]);
+	      groupList_SP.push(listOfList[i][3]);
+	        groupList_HT.push(listOfList[i][4]);
+		  groupList_SI.push(listOfList[i][5]);
+		    groupList_BL.push(listOfList[i][6]);
+		      groupList_KI.push(listOfList[i][7]);
+		        groupList_PC.push(listOfList[i][8]);
+			  groupList_SJ.push(listOfList[i][9]);
+			    groupList_GB.push(listOfList[i][10]);
+			      groupList_LR.push(listOfList[i][11]);
+      }
+        //alert ("i="+i)
+      //alert("groupList_BL:"+groupList_BL)
+
+      for (i = 0; i < 12; i++) {
+         cbHitWeight[i] = 0;
+      }
+        //alert ("cbHitWeight[0]="+cbHitWeight[0])
+        //alert ("i="+i)
+        //alert(cbList[0]+"....."+cbHitWeight[0]+"..1.."+groupList_LU[0]);
+
+      for (i = 0; i < cbList.length; i++) {
+           for (j=0;j<groupList_LU.length; j++){
+              if (groupList_LU[j] == cbList[i]){cbHitWeight[0] = cbHitWeight[0]+1;}
+           }
+           //alert ("i="+i+"  j="+j+" <---")
+           for (j=0;j<groupList_LI.length; j++){
+               if (groupList_LI[j] == cbList[i]){cbHitWeight[1] = cbHitWeight[1]+1;}
+           }
+           for (j=0;j<groupList_ST.length; j++){
+                if (groupList_ST[j] == cbList[i]){cbHitWeight[2] = cbHitWeight[2]+1;}
+           }
+           for (j=0;j<groupList_SP.length; j++){
+               if (groupList_SP[j] == cbList[i]){cbHitWeight[3] = cbHitWeight[3]+1;}
+           }
+           for (j=0;j<groupList_HT.length; j++){
+               if (groupList_HT[j] == cbList[i]){cbHitWeight[4] = cbHitWeight[4]+1;}
+           }
+           for (j=0;j<groupList_SI.length; j++){
+               if (groupList_SI[j] == cbList[i]){cbHitWeight[5] = cbHitWeight[5]+1;}
+           }
+           for (j=0;j<groupList_BL.length; j++){
+               if (groupList_BL[j] == cbList[i]){cbHitWeight[6] = cbHitWeight[6]+1;}
+           }
+           for (j=0;j<groupList_KI.length; j++){
+               if (groupList_KI[j] == cbList[i]){cbHitWeight[7] = cbHitWeight[7]+1;}
+           }
+           for (j=0;j<groupList_PC.length; j++){
+               if (groupList_PC[j] == cbList[i]){cbHitWeight[8] = cbHitWeight[8]+1;}
+           }
+           for (j=0;j<groupList_SJ.length; j++){
+               if (groupList_SJ[j] == cbList[i]){cbHitWeight[9] = cbHitWeight[9]+1;}
+           }
+           for (j=0;j<groupList_GB.length; j++){
+               if (groupList_GB[j] == cbList[i]){cbHitWeight[10] = cbHitWeight[10]+1;}
+           }
+           for (j=0;j<groupList_LR.length; j++){
+               if (groupList_LR[j] == cbList[i]){cbHitWeight[11] = cbHitWeight[11]+1;}
+           }
+        }
+     
+        //alert ("i="+i+", j="+j)
+        //alert(cbList[0]+"........."+cbHitWeight[0]);
+
+        listStr = "The Statistics Result:\n\n";
+        listStr = listStr + "\nLung_meridian score   : "+cbHitWeight[0];
+        listStr = listStr + "\nLarge Intestine_meridian score : "+cbHitWeight[1];
+        listStr = listStr + "\nStomach_meridian score   : "+cbHitWeight[2];
+        listStr = listStr + "\nSpleen_meridian score   : "+cbHitWeight[3];
+        listStr = listStr + "\nHeart_meridian score   : "+cbHitWeight[4];
+        listStr = listStr + "\nSmall Intestine_meridian score : "+cbHitWeight[5];
+        listStr = listStr + "\nBladder_meridian score : "+cbHitWeight[6];
+        listStr = listStr + "\nKidney_meridian score   : "+cbHitWeight[7];
+        listStr = listStr + "\nPericardium_meridian score : "+cbHitWeight[8];
+        listStr = listStr + "\nSanJiao_meridian score : "+cbHitWeight[9];
+        listStr = listStr + "\nGall Bladder_meridian score   : "+cbHitWeight[10];
+        listStr = listStr + "\nLiver_meridian score   : "+cbHitWeight[11];
+
+        //alert(listStr);
+
+
+        document.getElementById("myText").value = "";          
+        document.getElementById("myText").value += listStr;          
+  } // match : function pickFunction() {
+
+  </script>         
+         <br>
+  </div>
+
+ 
+ 
+ 
+</body>
+</html>
+
+
